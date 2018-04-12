@@ -93,6 +93,7 @@ public class DecisionTree implements Classifier {
 	@Override
 	public void buildClassifier(Instances arg0) throws Exception
 	{
+		depth = -1;
 		validationError = false;
 		m_classIndex = arg0.classIndex();
 		m_truNumAttributes = arg0.numAttributes()-1;
@@ -109,12 +110,12 @@ public class DecisionTree implements Classifier {
 
 		while (!n.m_leaf)
 		{
-			height++;
 			currentAttrIndex = n.attributeIndex;
 			if (n.children.length == 0) break;
 			if (n.children[(int)(instance.value(currentAttrIndex))] == null) break;
 
 			n = n.children[(int) (instance.value(currentAttrIndex))];
+			height++;
 		}
 
 		if (validationError)
