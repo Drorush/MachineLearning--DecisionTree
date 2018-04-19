@@ -10,6 +10,9 @@ import weka.core.pmml.jaxbbindings.Decision;
 import weka.filters.unsupervised.instance.RemoveWithValues;
 
 public class MainHW2 {
+	private static double best_Pvalue; // global variables
+	private static double best_ValidationError = Double.MAX_VALUE;
+	private static int best_PvalueIndex = -1;
 
 	public static BufferedReader readDataFile(String filename) {
 		BufferedReader inputReader = null;
@@ -22,7 +25,7 @@ public class MainHW2 {
 
 		return inputReader;
 	}
-	
+
 	/**
 	 * Sets the class index as the last attribute.
 	 * @param fileName
@@ -36,7 +39,7 @@ public class MainHW2 {
 		data.setClassIndex(data.numAttributes() - 1);
 		return data;
 	}
-	
+
 	public static void main(String[] args) throws Exception
 	{
 		Instances trainingCancer = loadData("cancer_train.txt");
@@ -44,15 +47,12 @@ public class MainHW2 {
 		Instances validationCancer = loadData("cancer_validation.txt");
 
 		DecisionTree dt = new DecisionTree();
-		trainData(dt, 1, trainingCancer); // train with Entropy
-		System.out.println("Validation error using Entropy: " + dt.calcAvgError(validationCancer));
-		trainData(dt, 0, trainingCancer); // train with Gini
-		System.out.println("Validation error using Gini: " + dt.calcAvgError(validationCancer));
+		chooseImpurityMeasure(dt, trainingCancer, validationCancer);
 		printMessages(dt, trainingCancer, validationCancer);
 		System.out.println("-----------------------------------------------------------");
-		System.out.println("Best validation error at p_value: 0.25");
-		dt.m_p_value = 2;
-		trainData(dt, 0, trainingCancer);
+		System.out.println("Best validation error at p_value: " + best_Pvalue);
+		dt.m_p_value = best_PvalueIndex;
+		trainData(dt, dt.impurityMeasure, trainingCancer);
 		System.out.println("Test error with best tree: " + dt.calcAvgError(testingCancer));
 		System.out.println("----------- Printing tree -----------");
 		dt.printTree();
@@ -76,12 +76,30 @@ public class MainHW2 {
 		System.out.println("Decision tree with p_value of: " + realValue);
 		System.out.println("The train error of the decision tree is: " + dt.calcAvgError(trainingCancer));
 		dt.validationError = true;
-		dt.calcAvgError(validationCancer);
+		double error = dt.calcAvgError(validationCancer);
+		if (error < best_ValidationError)
+		{
+			best_Pvalue = realValue;
+			best_ValidationError = error;
+			best_PvalueIndex = p_value;
+		}
 	}
 
 	private static void trainData(DecisionTree dt, int impurityMeasure, Instances trainingCancer) throws Exception
 	{
 		dt.impurityMeasure = impurityMeasure;
 		dt.buildClassifier(trainingCancer);
+	}
+
+	private static void chooseImpurityMeasure(DecisionTree dt, Instances trainingCancer, Instances validationCancer) throws Exception
+	{
+		trainData(dt, 1, trainingCancer); // train with Entropy
+		double entropyError = dt.calcAvgError(validationCancer);
+		System.out.println("Validation error using Entropy: " + entropyError);
+		trainData(dt, 0, trainingCancer); // train with Gini
+		double giniError = dt.calcAvgError(validationCancer);
+		System.out.println("Validation error using Gini: " + giniError);
+
+		dt.impurityMeasure = giniError < entropyError ? 0 : 1;
 	}
 }

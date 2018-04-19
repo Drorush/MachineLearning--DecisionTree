@@ -100,8 +100,8 @@ public class DecisionTree implements Classifier {
 		buildTree(arg0, impurityMeasure);
 		avgHeight = (sumOfHeight / arg0.size());
 	}
-    
-    @Override
+
+	@Override
 	public double classifyInstance(Instance instance)
 	{
 		Node n = rootNode;
@@ -129,15 +129,15 @@ public class DecisionTree implements Classifier {
 		}
 
 		return n.returnValue;
-    }
+	}
 
-    void printTree()
+	void printTree()
 	{
 		System.out.println("Root");
 		printTree(rootNode,"");
 	}
 
-    private void printTree(Node n, String tab)
+	private void printTree(Node n, String tab)
 	{
 		if (n.m_leaf || n.children.length == 0)
 		{
@@ -158,8 +158,8 @@ public class DecisionTree implements Classifier {
 	}
 
 
-    /** Builds the decision tree on given data set **/
-    private void buildTree(Instances data, int impurityMeasure) throws Exception
+	/** Builds the decision tree on given data set **/
+	private void buildTree(Instances data, int impurityMeasure) throws Exception
 	{
 		rootNode = new Node(data);
 		rootNode.parent = null;
@@ -176,16 +176,16 @@ public class DecisionTree implements Classifier {
 				next.attributeIndex = getBestAttribute(next.m_Instances, next, impurityMeasure);
 				if (next.attributeIndex != -1)
 				{
-						if (m_p_value > -1) // calculates chi and freedomDegree only when we are pruning
-						{
-							next.m_freedomDegree = (next.m_Instances.numDistinctValues(next.attributeIndex) - 2);
-							chiSquare = calcChiSquare(next.m_Instances, next.attributeIndex);
-						}
-						if (m_p_value == -1 || chiSquare >= chiTable[m_p_value][next.m_freedomDegree])
-						{
-							createChildrenForNode(next, data.attribute(next.attributeIndex).numValues());
-							insertChildrenToQueue(next, q);
-						}
+					if (m_p_value > -1) // calculates chi and freedomDegree only when we are pruning
+					{
+						next.m_freedomDegree = (next.m_Instances.numDistinctValues(next.attributeIndex) - 2);
+						chiSquare = calcChiSquare(next.m_Instances, next.attributeIndex);
+					}
+					if (m_p_value == -1 || chiSquare >= chiTable[m_p_value][next.m_freedomDegree])
+					{
+						createChildrenForNode(next, data.attribute(next.attributeIndex).numValues());
+						insertChildrenToQueue(next, q);
+					}
 				}
 				else
 				{
@@ -302,8 +302,8 @@ public class DecisionTree implements Classifier {
 	}
 
 	/** calculates the gain
-	   (giniGain or informationGain depending on the impurity measure)
-	    of splitting the input data according to the attribute.
+	 (giniGain or informationGain depending on the impurity measure)
+	 of splitting the input data according to the attribute.
 	 **/
 	private double calcGain(Instances data, int attributeIndex, int impurityMeasure) throws Exception
 	{
@@ -427,7 +427,7 @@ public class DecisionTree implements Classifier {
 	}
 
 	/** Calculates the chi square statistic of splitting the data according to the
-	 	splitting attribute as learned in class **/
+	 splitting attribute as learned in class **/
 	private double calcChiSquare(Instances data, int attributeIndex) throws Exception
 	{
 		double numOfInstancesWithAttrValue;				// Df
@@ -466,7 +466,7 @@ public class DecisionTree implements Classifier {
 	}
 
 
-    @Override
+	@Override
 	public double[] distributionForInstance(Instance arg0) throws Exception {
 		// Don't change
 		return null;
